@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="application">
+  
+  <jobTemplates>
+    <jobTemplate id="template_hypeapps">
+      <streamingExecutable>/application/node_historical/run.R</streamingExecutable>
+      <defaultParameters>
+         <parameter id="bdate" type="LiteralData" scope="runtime" title="Start of simulation *" abstract="Start date for simulation (yyyy-mm-dd)">2006-01-01</parameter>
+         <parameter id="cdate" type="LiteralData" scope="runtime" title="Start of result output *" abstract="Start date for results (yyyy-mm-dd)">2016-01-01</parameter>
+         <parameter id="edate" type="LiteralData" scope="runtime" title="End of simulation *" abstract="Last date for the simulation (yyyy-mm-dd)">2016-12-31</parameter>
+         <parameter id="variables" type="LiteralData" scope="runtime" title="Output variables *" abstract="Comma delimited list of HYPE output variables (4-letter code) used for time and basin output files">cout,crun</parameter>
+         <parameter id="basins" type="LiteralData" scope="runtime" title="Output sub-basins" abstract="Comma delimited list of HYPE sub-basin identifiers (SUBID number) for basin output files">-9999</parameter>
+         <parameter id="xobs" type="LiteralData" scope="runtime" title="Xobs file(s) (EO and In-situ data)" abstract="Xobs file(s) with pre-processed EO data or In-situ data (drag and drop from your data sets on the TEP portal)">-9999</parameter>
+      </defaultParameters>
+  
+      <defaultJobconf>
+        <property id="mapred.task.timeout">6000000</property>
+      </defaultJobconf>
+
+    </jobTemplate>
+
+  </jobTemplates>
+
+  <workflow id="workflow" title="Niger-HYPE historical simulation" abstract="This service allow users to make simulations for historical time periods (1979-2016) of river discharge, lake water levels, and land surface water balance in the Niger river basin with the hydrological model Niger-HYPE by SMHI. The output from the service can be downloaded for further offline analysis and visualization, or used as input to the Return Period Analysis service to derive warning level inputs to the Niger-HYPE Forecast service. Read more about the model on http://hypeweb.smhi.se/niger-hype.">
+
+    <workflowVersion>1.0</workflowVersion>
+
+    <node id="node_historical">
+
+      <job id="template_hypeapps"/>
+
+      <sources>
+        <source refid="string:list">input-1</source>
+      </sources>
+
+      <parameters>
+         <parameter id="bdate" type="LiteralData" scope="runtime">2006-01-01</parameter>
+         <parameter id="cdate" type="LiteralData" scope="runtime">2016-01-01</parameter>
+         <parameter id="edate" type="LiteralData" scope="runtime">2016-12-31</parameter>
+         <parameter id="variables" type="LiteralData" scope="runtime">cout,crun,evap,cprc,ctmp</parameter>
+         <parameter id="basins" type="LiteralData" scope="runtime">-9999</parameter>
+         <parameter id="xobs" type="LiteralData" scope="runtime">-9999</parameter>
+      </parameters>
+
+    </node>
+
+  </workflow>
+
+</application>
