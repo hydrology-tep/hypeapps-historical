@@ -73,7 +73,10 @@ readInfoDate<-function(thisline){
 }
 
 #main function to read info.txt into a useful list for easy modification
-readInfo<-function(filenm = "Info.txt"){
+readInfo<-function(filenm = "Info.txt"){ 
+  #
+  # updated to HYPE_DA_v5.x.0 (2017-07-14)
+  #
   #read info file into a list called info
   info.lines = readLines(filenm)
   info=list("info.lines"=info.lines)
@@ -132,10 +135,10 @@ readInfo<-function(filenm = "Info.txt"){
         info$outstatedate.lineNr=c(info$outstatedate.lineNr,i)
       }
     }
-    #doenkf          y
-    if(substr(thisline,1,6)=="doenkf"){
-      info$doenkf=readInfoLine(thisline,6)
-      info$doenkf.lineNr=i
+    #assimilation          y/n
+    if(substr(thisline,1,12)=="assimilation"){
+      info$assimilation=readInfoLine(thisline,12)
+      info$assimilation.lineNr=i
     }
     # basinoutput variable
     if(substr(thisline,1,20)=="basinoutput variable"){
@@ -152,6 +155,13 @@ readInfo<-function(filenm = "Info.txt"){
       info$timeoutput_variable=readInfoLine(thisline,19)
       info$timeoutput_variable.lineNr=i
     }
+    
+    # mapoutput variables
+    if(substr(thisline,1,18)=="mapoutput variable"){
+      info$mapoutput_variable=readInfoLine(thisline,18)
+      info$mapoutput_variable.lineNr=i
+    }
+    
   }
   info$noutstate = noutstate      
   return(info)
@@ -510,9 +520,11 @@ ReadTimeOutput <- function(filename, dt.format = "%Y-%m-%d", hype.var = NULL, ty
     select <- 1:(length(sbd) + 1)
   }
   
-  # read.table(filename, header = T, na.strings = "-9999", skip = 1)      
+  #read.table(filename, header = T, na.strings = "-9999", skip = 1)      
   x <- fread(filename,  na.strings = c("-9999", "****************"), skip = 2, sep = "\t", header = F, data.table = d.t, 
              select = select, nrows = nrows)
+  #x <- fread(filename,  na.strings = c("-9999", "****************"), skip = 2, sep = "auto", header = F, data.table = d.t, 
+  #           select = select, nrows = nrows)
   
   
   # read hype.var from filename, if not provided by user
@@ -615,3 +627,234 @@ ReadTimeOutput <- function(filename, dt.format = "%Y-%m-%d", hype.var = NULL, ty
   return(x)
 }
 
+###
+### MERGE XOBS DATA FRAMES
+###
+MergeXobs <- function(x, y, comment = "") {
+  
+#   # check time step with in both inputs and if they are identical
+#   # requires equidistant time steps
+#   if (!any(class(x) == "HypeXobs")) {
+#     warning("'x' not of class HypeXobs.")
+#     x.tstep <- difftime(x[2, 1], x[1, 1])
+#   } else {
+#     x.tstep <- attr(x, "timestep")
+#   }
+#   if (!any(class(y) == "HypeXobs")) {
+#     warning("'y' not of class HypeXobs.")
+#     y.tstep <- difftime(x[2, 1], x[1, 1])
+#   } else {
+#     y.tstep <- attr(y, "timestep")
+#   }
+#   
+#   if (x.tstep != y.tstep) {
+#     stop("Time step lengths in 'x' and 'y' differ.")
+#   }
+#   
+#   # check if there are any duplicated dates in x or y
+#   if (anyDuplicated(x[, 1]) || anyDuplicated(y[, 1])) {
+#     stop("Duplicated dates in either 'x' or 'y'.")
+#   }
+#   
+  # Create data frame with common time period column for both input xobs in appropriate time steps 
+  date.min <- min(min(x[, 1]), min(y[, 1]))
+  date.max <- max(max(x[, 1]), max(y[, 1]))
+  res <- data.frame(date = seq(date.min, date.max, by = x.tstep))
+  
+  
+  # merge x and y with new time axis individually
+  res1 <- merge(res, x, by = 1, all = TRUE)
+#  attr(res1, "comment") <- attr(x, "comment")
+  attr(res1, "variable") <- attr(x, "variable")
+  attr(res1, "subid") <- attr(x, "subid")
+#  attr(res1, "class") <- attr(x, "class")
+#  attr(res1, "timestep") <- attr(x, "timestep")
+  
+  res2 <- merge(res, y, by = 1, all = TRUE)
+#  attr(res2, "comment") <- attr(y, "comment")
+  attr(res2, "variable") <- attr(y, "variable")
+  attr(res2, "subid") <- attr(y, "subid")
+#  attr(res2, "class") <- attr(y, "class")
+#  attr(res2, "timestep") <- attr(y, "timestep")
+  
+  
+  # extract variable names from the merged data and match common column where observations have to be merged
+  names1 <- paste0(attr(res1, "variable"), "_", attr(res1, "subid"))
+  names2 <- paste0(attr(res2, "variable"), "_", attr(res2, "subid"))
+  common.cols <- match(names1, names2)
+  
+  # conditional: common columns exist, merge them
+  if(length(na.omit(common.cols)) > 0) {
+    cat("Common columns found, merging.\n")
+    cat(paste0("Common column indices in 'x': ", paste(which(!is.na(common.cols)) + 1, collapse = " "), "\n"))
+    cat(paste0("Common column indices in 'y': ", paste(as.integer(na.omit(common.cols)) + 1, collapse = " "), "\n"))
+    # columns to merge, res1
+    te1 <- res1[, c(TRUE, !is.na(common.cols))]
+    # columns to merge, res2
+    te2 <- res2[, c(1, as.integer(na.omit(common.cols)) + 1)]
+    
+    # fill observations from xobs without precedence into the one with precedence, if no obs exist there
+    # mapply this to all identified columns (te1 and te2 are ALWAYS of the same length, therefore mapply is safe)
+    te3 <- as.data.frame(mapply(function(x, y) {ifelse(!is.na(x), x, y)}, te1, te2))
+    
+    # update columns in data source with precedence
+    res1[, c(FALSE, !is.na(common.cols))] <- te3[, -1]
+    
+    # remove columns from data source without precedence
+    res2 <- res2[, -(as.integer(na.omit(common.cols)) + 1)]
+    
+  }
+  
+  # combine the results, catch special case where all columns are common and only a date vector is left in res2
+  if(is.data.frame(res2)) {
+    res <- suppressWarnings(cbind(res, res1[, -1], res2[, -1]))
+  } else {
+    res <- suppressWarnings(cbind(res, res1[, -1]))
+  }
+  
+  # update comment attribute, conditional on function argument value
+  if (comment == "") {
+    comment <- paste0("!Created by MergeXobs. Original comments: ", 
+                      attr(x,"comment"), " (x); ", attr(y,"comment"), " (y)")
+  }
+  
+  # reconstruct other HypeXobs attributes from res1 and res2
+  res <- HypeXobs(x = res, comment = comment, 
+                  variable = c(attr(res1, "variable"), attr(res2, "variable")), 
+                  subid = c(attr(res1, "subid"), attr(res2, "subid")))
+  
+  return(res)
+}
+
+##
+## ReadPTQobs
+##
+ReadPTQobs <- function (filename, dt.format = "%Y-%m-%d", nrows = -1) {
+  
+  ## import ptqobs file header, extract attribute
+  # import
+  xattr <- readLines(filename,n = 1)
+  # extract obsids
+  sbd <- as.integer(strsplit(xattr, split = "\t")[[1]][-1])
+  
+  # read the data
+  x <- fread(filename,  na.strings = "-9999", sep = "\t", header = T, data.table = F, nrows = nrows)
+  #colClasses = c("NA", rep("numeric", length(sbd))))
+  
+  attr(x, which = "obsid") <- sbd
+  
+  # date conversion 
+  xd <- as.POSIXct(strptime(x[, 1], format = dt.format), tz = "GMT")
+  x[, 1] <- xd
+  #x[, 1] <- tryCatch(na.fail(xd), error = function(e) {
+  #  print("Date/time conversion attempt led to introduction of NAs, date/times returned as strings"); return(x[, 1])
+  # })
+  
+  return(x)
+}
+
+##
+## WritePTQobs
+##
+WritePTQobs <- function (x, filename, dt.format = "%Y-%m-%d", digits = 3, nsmall = 1, obsid = NULL) {
+  
+  ## check if consistent header information is available, obsid arguments take precedence before attribute
+  if(!is.null(obsid)) {
+    if (length(obsid) == ncol(x) - 1) {
+      header <- c("DATE", obsid)
+    } else {
+      stop("Length of function argument 'obsid' does not match number of obsid columns in export object.")
+    }
+  } else if (!is.null(attr(x, which = "obsid"))) {
+    if (length(attr(x, which = "obsid")) == ncol(x) - 1) {
+      header <- c("DATE", attr(x, which = "obsid"))
+    } else {
+      stop("Length of attribute 'obsid' does not match number of obsid columns in export object.")
+    }
+  } else {
+    stop("No information available from 'obsid' argument or 'obsid' attribute to construct export header.")
+  }
+  
+  # date conversion, conditional on that the date column is a posix class
+  if (any(class(x[, 1]) == "POSIXct")) {
+    x[, 1] <- format(x[, 1], format = dt.format)
+  } else {
+    warning("First column in export data frame is not of class 'POSIXct', will be exported unchanged.")
+  }
+  
+  # convert NAs to -9999, needed because format() below does not allow for automatic replacement of NA strings 
+  x[is.na(x)] <- -9999
+  
+  # export
+  write.table(format(x, digits = digits, nsmall = nsmall, scientific = F, drop0trailing = T, trim = T), file = filename, 
+              quote = FALSE, sep = "\t", row.names = FALSE, col.names = header)
+  
+}
+
+
+###
+### ReadXobs
+###
+ReadXobs <- function (filename = "Xobs.txt", dt.format="%Y-%m-%d", nrows = -1L) {
+  
+  ## import xobs file header, extract attributes
+  # import (3-row header)
+  xattr <- readLines(filename,n=3)
+  # 1st row, comment
+  # split string elements along tabs, returns list of character vectors
+  cmt <- strsplit(xattr[1], split = "\t")
+  # remove empty strings (excel export artefacts)
+  cmt <- sapply(cmt, function(x) {te <- nchar(x);te <- ifelse(te == 0, F, T);x[te]})
+  # 2nd row, HYPE variable IDs
+  hype.var <- toupper(strsplit(xattr[2], split = "\t")[[1]][-1])
+  # 3rd row, SUBIDs
+  sbd <- as.integer(strsplit(xattr[3], split = "\t")[[1]][-1])
+  
+  
+  # read the data, skip header and comment rows, force numeric data (automatic column classes can be integer)
+  xobs <- fread(filename,  na.strings = "-9999", skip = 3, sep = "\t", header = F, data.table = F, nrows = nrows, 
+                colClasses = c("NA", rep("numeric", length(sbd))))
+  
+  # update header, composite of variable and subid
+  names(xobs) <- c("DATE", paste(hype.var, sbd, sep = "_"))
+  
+  # warn if duplicate columns found, throw useful msg
+  if (length(names(xobs)) != length(unique(names(xobs)))) {
+    warning(paste0("Duplicated variable-SUBID combination(s) in file: ", paste(names(xobs)[duplicated(names(xobs))], collapse = " ")))
+    duplifree <- FALSE
+  } else {
+    duplifree <- TRUE
+  }
+  
+  # date conversion 
+  xd <- as.POSIXct(strptime(xobs[, 1], format = dt.format), tz = "GMT")
+#  xobs[, 1] <- tryCatch(na.fail(xd), error = function(e) {
+#    cat("Date/time conversion attempt led to introduction of NAs, date/times returned as strings.\nImported as data frame, not as 'HypeXobs' object.\n"); return(xobs[, 1])})
+  
+  
+  # if date conversion worked and time steps are HYPE-conform (need at least 2 time steps), make returned object class HypeXobs
+#  if(!is.character(xobs[, 1]) && duplifree && nrow(xobs) > 1) {
+    
+    # create HypeXobs object, can fail if multi-day time steps in imported table
+#    xobs <- tryCatch(HypeXobs(x = xobs, comment = cmt, variable = hype.var, subid = sbd), 
+#                     error = function(e) {cat("Longer-than-daily time steps not allowed in HypeXobs objects.\n"); return(xobs)})
+    
+    # update with additional attributes if HypeXobs class assignment failed
+#    if (!any(class(xobs) == "HypeXobs")) {
+      attr(xobs, which = "comment") <- cmt
+      attr(xobs, which = "variable") <- hype.var
+      attr(xobs, which = "subid") <- sbd
+#      warning("Imported as data frame, not as 'HypeXobs' object.")
+#    }
+    
+#  } else {
+#    # update with additional attributes if not a HypeXobs object
+#    attr(xobs, which = "comment") <- cmt
+#    attr(xobs, which = "variable") <- hype.var
+#    attr(xobs, which = "subid") <- sbd
+#    
+#    warning("Imported as data frame, not as 'HypeXobs' object.")
+#  }
+  
+  return(xobs)
+}

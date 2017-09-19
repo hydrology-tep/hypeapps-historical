@@ -5,12 +5,157 @@
     <jobTemplate id="template_hypeapps">
       <streamingExecutable>/application/node_historical/run.R</streamingExecutable>
       <defaultParameters>
-         <parameter id="bdate" type="LiteralData" scope="runtime" title="Start of simulation *" abstract="Start date for simulation (yyyy-mm-dd)">2006-01-01</parameter>
-         <parameter id="cdate" type="LiteralData" scope="runtime" title="Start of result output *" abstract="Start date for results (yyyy-mm-dd)">2016-01-01</parameter>
-         <parameter id="edate" type="LiteralData" scope="runtime" title="End of simulation *" abstract="Last date for the simulation (yyyy-mm-dd)">2016-12-31</parameter>
-         <parameter id="variables" type="LiteralData" scope="runtime" title="Output variables *" abstract="Comma delimited list of HYPE output variables (4-letter code) used for time and basin output files">cout,crun</parameter>
-         <parameter id="basins" type="LiteralData" scope="runtime" title="Output sub-basins" abstract="Comma delimited list of HYPE sub-basin identifiers (SUBID number) for basin output files">-9999</parameter>
-         <parameter id="xobs" type="LiteralData" scope="runtime" title="Xobs file(s) (EO and In-situ data)" abstract="Xobs file(s) with pre-processed EO data or In-situ data (drag and drop from your data sets on the TEP portal)">-9999</parameter>
+         <parameter id="cdate" type="LiteralData" scope="runtime" title="Start of simulation (yyyy-mm-dd)" abstract="Simulation start date" minOccurs="1" maxOccurs="1">2016-01-01</parameter>
+         <parameter id="edate" type="LiteralData" scope="runtime" title="End of simulation (yyyy-mm-dd)" abstract="Simulation end date" minOccurs="1" maxOccurs="1">2016-12-31</parameter>
+
+         <parameter id="variables" type="LiteralData" scope="runtime" title="Output variables" abstract="Select output variables" minOccurs="1" maxOccurs="17">
+           <options>
+	     <option>River Discharge, m3/s, COUT</option>           
+	     <option>Air Temperature, C, CTMP</option>
+	     <option>Precipitation, mm/day, CPRC</option>
+	     <option>Evapotranspiration, mm/day, EVAP</option>
+	     <option>Total Runoff, mm/day, CRUN</option>
+	     <option>Surface Runoff, mm/day, CROS</option>
+	     <option>Soil Moisture - fraction of plant avalable water in the root zone, -, SRFF</option>
+	     <option>Soil Moisture - total storage in root zone, mm, SMRZ</option>
+	     <option>Soil Moisture - total storage in soil profile, mm, SOIM</option>
+	     <option>Lake Water Level, m, WCOM</option>
+	     
+	     <option>Lake Water Volume - outlet lakes, 10e6m3, COLV</option>
+	     <option>Lake Water Volume - internal lakes, 10e6m3, CILV</option>
+	     <option>River Water Volume - main river, m3, CMRV</option>
+	     <option>River Water Volume - local river, m3, CLRV</option>
+	     <option>Floodplan Water Volume - outlet lake, 10e6m3, OLFV</option>
+	     <option>Floodplain Water Volume - main river, m3, MRFV</option>
+
+	     <option>Total Surface Water Area - lakes, rivers, and floodplains, km2, CSWA</option> 
+	    <default>River Discharge, m3/s, COUT</default> 
+           </options>
+         </parameter>
+
+         <parameter id="basinselect" type="LiteralData" scope="runtime" title="Output sub-basins" abstract="Select output sub-basins" minOccurs="0" maxOccurs="100">
+           <options>
+                 <option>Qstn Banankoro, 7259</option>
+	         <option>Qstn Kouto Aval, 6823</option>
+	         <option>Qstn Couberi sur le fleuve Sota, 15</option>
+	         <option>Qstn Kompongou sur le fleuve Mekrou, 7496</option>
+	         <option>Qstn Malanville, 7902</option>
+	         <option>Qstn Yankin route kandi-Banikoara sur Alibor, 7954</option>
+	         <option>Qstn Botou, 8791</option>
+	         <option>Qstn Falagountou, 4217</option>
+	         <option>Qstn Koriziena, 10490</option>
+	         <option>Qstn Manni, 10613</option>
+	         <option>Qstn Sebba, 4139</option>
+	         <option>Qstn Tinakof, 10532</option>
+	         <option>Qstn Buffle Noir, 3780</option>
+	         <option>Qstn Cossi, 9705</option>
+	         <option>Qstn Garoua, 3434</option>
+	         <option>Qstn Gouri, 7245</option>
+	         <option>Qstn Riao, 271</option>
+	         <option>Qstn Tchollire (Mayo Galkke), 3277</option>
+	         <option>Qstn Baranama, 7006</option>
+	         <option>Qstn Baro, 11684</option>
+	         <option>Qstn Dabola, 11462</option>
+	         <option>Qstn Dialakoro, 9507</option>
+	         <option>Qstn Faranah, 6145</option>
+	         <option>Qstn Kankan, 7131</option>
+	         <option>Qstn Kerouane, 22549</option>
+	         <option>Qstn Kissidougou, 17008</option>
+	         <option>Qstn Kouroussa, 4370</option>
+	         <option>Qstn Mandiana, 7662</option>
+	         <option>Qstn Tinkisso, 637</option>
+	         <option>Qstn Ansongo, 3508</option>
+	         <option>Qstn Bougouni, 9108</option>
+	         <option>Qstn Dioila, 11476</option>
+	         <option>Qstn Douna, 12881</option>
+	         <option>Qstn Kirango Aval, 13530</option>
+	         <option>Qstn Koulikoro, 12</option>
+	         <option>Qstn Kouro, 8127</option>
+	         <option>Qstn Pankourou, 9367</option>
+	         <option>Qstn Selingue Aval, 264</option>
+	         <option>Qstn Tossaye, 12552</option>
+	         <option>Qstn Alcongui, 4119</option>
+	         <option>Qstn Barou Bge Avl, 8721</option>
+	         <option>Qstn Kandadji, 3830</option>
+	         <option>Qstn Campement Du DoubleVe, 8630</option>
+	         <option>Qstn Garbe Kourou, 5004</option>
+	         <option>Qstn Kakassi, 6016</option>
+	         <option>Qstn Niamey, 4244</option>
+	         <option>Qstn Nielloua, 3789</option>
+	         <option>Qstn Tamou, 8471</option>
+	         <option>Qstn Tera, 5366</option>
+	         <option>Qstn W, 8704</option>
+	         <option>Qstn Baro, 1335</option>
+	         <option>Qstn Ibi, 8</option>
+	         <option>Qstn Jebba Bridge, 41</option>
+	         <option>Qstn Yidere Bode, 4</option>
+	         <option>Qstn Katsina Alla, 677</option>
+	         <option>Qstn Kende, 8183</option>
+	         <option>Qstn Lau, 3151</option>
+	         <option>Qstn Lokoja, 21</option>
+	         <option>Qstn Makurdi, 1021</option>
+	         <option>Qstn Onitsha, 3923</option>
+	         <option>Qstn Umaisha, 1356</option>
+	         <option>Qstn Wuya, 1379</option>
+	         <option>Qstn Iradougou, 9657</option>
+	         <option>Lake NoName, 155</option>
+	         <option>Lake Boukouma, 8675</option>
+	         <option>Lake Djibo, 9745</option>
+	         <option>Lake Manni, 9875</option>
+	         <option>Lake Zegnedegen, 8595</option>
+	         <option>Lake Kouna, 4413</option>
+	         <option>Lake Goronye, 182</option>
+	         <option>Lake Jibiya, 201</option>
+	         <option>Lake Bakolori, 202</option>
+	         <option>Lake Zobe, 206</option>
+	         <option>Lake Boudieri, 8561</option>
+	         <option>Lake Zaria, 750</option>
+	         <option>Lake Kangimi, 1998</option>
+	         <option>Lake Kubli, 7841</option>
+	         <option>Lake Swashi, 7922</option>
+	         <option>Lake Dadin_Kowa, 219</option>
+	         <option>Lake Shiroro, 212</option>
+	         <option>Lake Kainji, 253</option>
+	         <option>Lake Kiri, 228</option>
+	         <option>Lake Asa, 4274</option>
+	         <option>Lake Omi, 259</option>
+	         <option>Lake Ero, 2</option>
+	         <option>Lake Jebra, 281</option>
+	         <option>Lake Bilanga, 12036</option>
+	         <option>Lake BilangaYanga, 7936</option>
+	         <option>Lake Tougouri, 10277</option>
+	         <option>Lake Seytenga, 5389</option>
+	         <option>Lake Tapoa, 7609</option>
+	         <option>Lake oneDelta, 37</option>
+	         <option>Lake Noname2, 10303</option>
+                 <option>Lake Noname3, 9321</option>
+ 	         <default>Qstn Niamey, 4244</default>
+           </options>
+          </parameter>
+         <parameter id="basinset" type="LiteralData" scope="runtime" title="Output sub-basins (SUBID)" abstract="Comma delimited, HYPE sub-basin identifiers" minOccurs="0" maxOccurs="850">-9999</parameter>
+
+         <parameter id="xobs" type="LiteralData" scope="runtime" title="Xobs file(s) with EO and/or In-situ data)" abstract="Pre-processed data in Xobs.txt format." minOccurs="0" maxOccurs="1">-9999</parameter>
+
+         <parameter id="assimOn" type="LiteralData" scope="runtime" title="Assimilation on/off" abstract="Data assimilation on/off" minOccurs="1" maxOccurs="1">
+          <options>
+           <option>on</option>
+           <option>off</option>
+           <default>off</default>
+          </options>
+         </parameter>
+
+         <parameter id="assimVars" type="LiteralData" scope="runtime" title="Assimilated observations" abstract="Observations to be assimilated" minOccurs="1" maxOccurs="5">
+          <options>
+           <option>Lake Water Level - altimetry, AOWL, WCOM</option>
+           <option>Openloop - ensembles without assimilation, OPEN, LOOP</option>
+<!--	   <option>Lake Water Level - in-situ, WSTR, WCOM</option>
+	   <option>River Water Level - altimetry, AMWL, CMWL</option>
+	   <option>River Water Level - in-situ, RMWL, CMWL</option> 
+ 	   <option>River Discharge - in-situ, ROUT, COUT</option> -->
+           <default>Lake Water Level - altimetry, AOWL, WCOM</default>
+          </options>
+         </parameter>
+
       </defaultParameters>
   
       <defaultJobconf>
@@ -21,7 +166,7 @@
 
   </jobTemplates>
 
-  <workflow id="workflow" title="Niger-HYPE historical simulation" abstract="This service allow users to make simulations for historical time periods (1979-2016) of river discharge, lake water levels, and land surface water balance in the Niger river basin with the hydrological model Niger-HYPE by SMHI. The output from the service can be downloaded for further offline analysis and visualization, or used as input to the Return Period Analysis service to derive warning level inputs to the Niger-HYPE Forecast service. Read more about the model on http://hypeweb.smhi.se/niger-hype.">
+  <workflow id="workflow" title="Niger-HYPE historical simulation" abstract="Simulate hydrology of the Niger River basin for historical time periods (1979-current time) with the Niger-HYPE model. More info at http://hypeweb.smhi.se/niger-hype/about and http://www.smhi.net/hype/wiki.">
 
     <workflowVersion>1.0</workflowVersion>
 
@@ -34,12 +179,156 @@
       </sources>
 
       <parameters>
-         <parameter id="bdate" type="LiteralData" scope="runtime">2006-01-01</parameter>
-         <parameter id="cdate" type="LiteralData" scope="runtime">2016-01-01</parameter>
-         <parameter id="edate" type="LiteralData" scope="runtime">2016-12-31</parameter>
-         <parameter id="variables" type="LiteralData" scope="runtime">cout,crun,evap,cprc,ctmp</parameter>
-         <parameter id="basins" type="LiteralData" scope="runtime">-9999</parameter>
-         <parameter id="xobs" type="LiteralData" scope="runtime">-9999</parameter>
+         <parameter id="cdate" type="LiteralData" scope="runtime">2016-04-01</parameter>
+         <parameter id="edate" type="LiteralData" scope="runtime">2017-03-31</parameter>
+         <parameter id="variables" type="LiteralData" scope="runtime">
+           <options>
+	     <option>River Discharge, m3/s, COUT</option>           
+	     <option>Air Temperature, C, CTMP</option>
+	     <option>Precipitation, mm/day, CPRC</option>
+	     <option>Evapotranspiration, mm/day, EVAP</option>
+	     <option>Total Runoff, mm/day, CRUN</option>
+	     <option>Surface Runoff, mm/day, CROS</option>
+	     <option>Soil Moisture - fraction of plant avalable water in the root zone, -, SRFF</option>
+	     <option>Soil Moisture - total storage in root zone, mm, SMRZ</option>
+	     <option>Soil Moisture - total storage in soil profile, mm, SOIM</option>
+	     <option>Lake Water Level, m, WCOM</option>
+	     <option>Lake Water Volume - outlet lakes, 10e6m3, COLV</option>
+	     <option>Lake Water Volume - internal lakes, 10e6m3, CILV</option>
+	     <option>River Water Volume - main river, m3, CMRV</option>
+	     <option>River Water Volume - local river, m3, CLRV</option>
+	     <option>Floodplan Water Volume - outlet lake, 10e6m3, OLFV</option>
+	     <option>Floodplain Water Volum - main river, m3, MRFV</option>
+	     <option>Total Surface Water Area - lakes rivers and floodplains, km2, CSWA</option> 
+	    <default>River Discharge, m3/s, COUT</default> 
+	   </options>
+         </parameter>
+         
+         <parameter id="basinselect" type="LiteralData" scope="runtime">
+           <options>
+                 <option>Qstn Banankoro, 7259</option>
+	         <option>Qstn Kouto Aval, 6823</option>
+	         <option>Qstn Couberi sur le fleuve Sota, 15</option>
+	         <option>Qstn Kompongou sur le fleuve Mekrou, 7496</option>
+	         <option>Qstn Malanville, 7902</option>
+	         <option>Qstn Yankin route kandi-Banikoara sur Alibor, 7954</option>
+	         <option>Qstn Botou, 8791</option>
+	         <option>Qstn Falagountou, 4217</option>
+	         <option>Qstn Koriziena, 10490</option>
+	         <option>Qstn Manni, 10613</option>
+	         <option>Qstn Sebba, 4139</option>
+	         <option>Qstn Tinakof, 10532</option>
+	         <option>Qstn Buffle Noir, 3780</option>
+	         <option>Qstn Cossi, 9705</option>
+	         <option>Qstn Garoua, 3434</option>
+	         <option>Qstn Gouri, 7245</option>
+	         <option>Qstn Riao, 271</option>
+	         <option>Qstn Tchollire (Mayo Galkke), 3277</option>
+	         <option>Qstn Baranama, 7006</option>
+	         <option>Qstn Baro, 11684</option>
+	         <option>Qstn Dabola, 11462</option>
+	         <option>Qstn Dialakoro, 9507</option>
+	         <option>Qstn Faranah, 6145</option>
+	         <option>Qstn Kankan, 7131</option>
+	         <option>Qstn Kerouane, 22549</option>
+	         <option>Qstn Kissidougou, 17008</option>
+	         <option>Qstn Kouroussa, 4370</option>
+	         <option>Qstn Mandiana, 7662</option>
+	         <option>Qstn Tinkisso, 637</option>
+	         <option>Qstn Ansongo, 3508</option>
+	         <option>Qstn Bougouni, 9108</option>
+	         <option>Qstn Dioila, 11476</option>
+	         <option>Qstn Douna, 12881</option>
+	         <option>Qstn Kirango Aval, 13530</option>
+	         <option>Qstn Koulikoro, 12</option>
+	         <option>Qstn Kouro, 8127</option>
+	         <option>Qstn Pankourou, 9367</option>
+	         <option>Qstn Selingue Aval, 264</option>
+	         <option>Qstn Tossaye, 12552</option>
+	         <option>Qstn Alcongui, 4119</option>
+	         <option>Qstn Barou Bge Avl, 8721</option>
+	         <option>Qstn Kandadji, 3830</option>
+	         <option>Qstn Campement Du DoubleVe, 8630</option>
+	         <option>Qstn Garbe Kourou, 5004</option>
+	         <option>Qstn Kakassi, 6016</option>
+	         <option>Qstn Niamey, 4244</option>
+	         <option>Qstn Nielloua, 3789</option>
+	         <option>Qstn Tamou, 8471</option>
+	         <option>Qstn Tera, 5366</option>
+	         <option>Qstn W, 8704</option>
+	         <option>Qstn Baro, 1335</option>
+	         <option>Qstn Ibi, 8</option>
+	         <option>Qstn Jebba Bridge, 41</option>
+	         <option>Qstn Yidere Bode, 4</option>
+	         <option>Qstn Katsina Alla, 677</option>
+	         <option>Qstn Kende, 8183</option>
+	         <option>Qstn Lau, 3151</option>
+	         <option>Qstn Lokoja, 21</option>
+	         <option>Qstn Makurdi, 1021</option>
+	         <option>Qstn Onitsha, 3923</option>
+	         <option>Qstn Umaisha, 1356</option>
+	         <option>Qstn Wuya, 1379</option>
+	         <option>Qstn Iradougou, 9657</option>
+	         <option>Lake NoName, 155</option>
+	         <option>Lake Boukouma, 8675</option>
+	         <option>Lake Djibo, 9745</option>
+	         <option>Lake Manni, 9875</option>
+	         <option>Lake Zegnedegen, 8595</option>
+	         <option>Lake Kouna, 4413</option>
+	         <option>Lake Goronye, 182</option>
+	         <option>Lake Jibiya, 201</option>
+	         <option>Lake Bakolori, 202</option>
+	         <option>Lake Zobe, 206</option>
+	         <option>Lake Boudieri, 8561</option>
+	         <option>Lake Zaria, 750</option>
+	         <option>Lake Kangimi, 1998</option>
+	         <option>Lake Kubli, 7841</option>
+	         <option>Lake Swashi, 7922</option>
+	         <option>Lake Dadin_Kowa, 219</option>
+	         <option>Lake Shiroro, 212</option>
+	         <option>Lake Kainji, 253</option>
+	         <option>Lake Kiri, 228</option>
+	         <option>Lake Asa, 4274</option>
+	         <option>Lake Omi, 259</option>
+	         <option>Lake Ero, 2</option>
+	         <option>Lake Jebra, 281</option>
+	         <option>Lake Bilanga, 12036</option>
+	         <option>Lake BilangaYanga, 7936</option>
+	         <option>Lake Tougouri, 10277</option>
+	         <option>Lake Seytenga, 5389</option>
+	         <option>Lake Tapoa, 7609</option>
+	         <option>Lake oneDelta, 37</option>
+	         <option>Lake Noname2, 10303</option>
+                 <option>Lake Noname3, 9321</option>
+             
+	         <default>Qstn Niamey, 4244</default>
+	      </options>
+         </parameter>
+         
+         <parameter id="basinset" type="LiteralData" scope="runtime"></parameter>
+         <parameter id="xobs" type="LiteralData" scope="runtime"></parameter>
+         
+         <parameter id="assimOn" type="LiteralData" scope="runtime">
+	  <options>
+	   <option>on</option>
+	   <option>off</option>
+	   <default>off</default>
+	  </options>
+	 </parameter>
+	      
+	 <parameter id="assimVars" type="LiteralData" scope="runtime">
+	  <options>
+	   <option>Lake Water Level - altimetry, AOWL, WCOM</option>
+           <option>Openloop - ensembles without assimilation, OPEN, LOOP</option>
+<!--	   <option>Lake Water Level - in-situ, WSTR, WCOM</option>
+	   <option>River Water Level - altimetry, AMWL, CMWL</option>
+	   <option>River Water Level - in-situ, RMWL, CMWL</option> 
+	   <option>River Discharge - in-situ, ROUT, COUT</option> -->
+	   <default>Lake Water Level - altimetry, AOWL, WCOM</default>
+	  </options>
+	 </parameter> 
+
+         
       </parameters>
 
     </node>

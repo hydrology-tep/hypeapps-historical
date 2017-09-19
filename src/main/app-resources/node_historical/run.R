@@ -16,17 +16,7 @@
 
 # Application 1: "Niger-HYPE historical period" (hypeapps-historial)
 # Author:         David Gustafsson, SMHI
-# Version:        2017-05-16
-
-# Remaining issues: 
-#
-# PLOTTING is disabled due to (a) lack of X11 server on sandbox, or 
-#   (b) conflict on libjeg-version between r-cairo and python pil (needed for gdal and r-rgdal) 
-#
-# solution: waiting for Terradues response to support issue #5720
-#
-# XOBS file integration still to be developed
-
+# Version:        2017-08-23
 
 # Workflow overview:
 # ------------------
@@ -72,7 +62,7 @@ if(app.sys=="tep"){
 ## 2 - Application user inputs
 ## ------------------------------------------------------------------------------
 ## application input parameters
-app.inputs <- getHypeAppInputs(appName = app.name)
+app.input <- getHypeAppInput(appName = app.name)
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste(" hypeapps inputs and parameters read"), "/node_historical/run.R")}
 
@@ -84,47 +74,69 @@ app.setup <- getHypeAppSetup(modelName = model.name,
                              modelBin  = model.bin,
                              tmpDir    = app.tmp_path,
                              appDir    = app.app_path,
-                             appName   = app.name)
+                             appName   = app.name,
+                             appInput  = app.input,
+                             modelFilesURL = model.files.url,
+                             forcingArchiveURL = forcing.archive.url,
+                             stateFilesURL = state.files.url,
+                             stateFilesIN = state.files)
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("HypeApp setup read"), "/node_historical/run.R")}
 
 ## ------------------------------------------------------------------------------
 ## forcing data
 model.forcing <- getModelForcing(appSetup   = app.setup,
-                                 appInputs  = app.inputs,
+                                 appInput   = app.input,
                                  dataSource = forcing.data.source)
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("model forcing set"), "/node_historical/run.R")}
 
 ## ------------------------------------------------------------------------------
+## get Xobs input file(s) from open catalogue
+xobs.data <- getXobsData(appInput = app.input,
+                         appSetup = app.setup)
+if(app.sys=="tep"){rciop.log ("DEBUG", paste("xobs data downloaded from catalogue"), "/node_historical/run.R")}
+
+## ------------------------------------------------------------------------------
+## read downloaded Xobs input file(s) - merge into one Xobs.txt in the model run folder
+xobs.input <- readXobsData(appSetup = app.setup,
+                         xobsData = xobs.data)
+if(app.sys=="tep"){rciop.log ("DEBUG", paste("xobs data merged to model rundir"), "/node_historical/run.R")}
+
+## ------------------------------------------------------------------------------
 ## modify some model files based on input parameters
-model.input <- updateModelInput(appSetup = app.setup, appInputs = app.inputs)
+model.input <- updateModelInput(appSetup = app.setup, appInput = app.input, modelForcing = model.forcing, xobsInput = xobs.input)
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("model inputs modified"), "/node_historical/run.R")}
+
 
 #################################################################################
 ## 4 - Run application
 ## ------------------------------------------------------------------------------
 ##  run model
-if(model.input==0){
-  if(app.sys=="tep"){rciop.log ("DEBUG", " starting model run ...", "/node_historical/run.R")}
-  model.run = system(command = app.setup$runCommand,intern = T)
-}
-if(app.sys=="tep"){rciop.log ("DEBUG", " ... model run ready", "/node_historical/run.R")}
+if(app.sys=="tep"){rciop.log ("DEBUG", " starting model run ...", "/node_historical/run.R")}
+model.run = system(command = app.setup$runCommand,intern = T,)
+
+if(app.sys=="tep"){rciop.log ("DEBUG", paste(" ... model run ready, exit code: ",attr(model.run,"status"),sep=""), "/node_historical/run.R")}
+
+
 
 #################################################################################
 ## 5 - Output
 ## ------------------------------------------------------------------------------
 ## post-process output data
-app.outdir <- prepareHypeAppsOutput(appSetup  = app.setup,appInput = app.inputs, runRes = model.run)
+app.outdir <- prepareHypeAppsOutput(appSetup  = app.setup,
+                                    appInput = app.input,
+                                    modelInput = model.input,
+                                    runRes = attr(model.run,"status"))
 
 ## ------------------------------------------------------------------------------
-## publish postprocessed results
+## publish postprocessed results (adding /* to avoid duplicate outputs to the user)
 if(app.sys=="tep"){
-  rciop.publish(path=app.outdir, recursive=TRUE, metalink=TRUE)
+  rciop.publish(path=paste(app.outdir,"/*",sep=""), recursive=FALSE, metalink=TRUE)
 }
 #################################################################################
 ## 6 - End of workflow
 ## ------------------------------------------------------------------------------
 ## exit with appropriate status code
-q(save="yes", status = 0)
+q(save="no", status = 0)

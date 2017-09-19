@@ -16,7 +16,7 @@
 #
 # hypeapps-csv-utils.R: Utilities to read/write csv time series data in the TEP Hydrology format.
 # Author:               Anna Kuenz, David Gustafsson, SMHI
-# Version:              2017-05-15
+# Version:              2017-08-25
 
 # -------------------------------------------------------------------
 # dependancies
@@ -33,7 +33,7 @@ if(app.sys=="tep"){
 ## --------------------------------------------------------------------
 ## Transform HYPE basin output files to TEP csv time series format
 ## --------------------------------------------------------------------
-basinfiles2csv<-function(hypeFile=NULL,csvFile=NULL,hype2csv=NULL,hype2csvFile=NULL){
+basinfiles2csv<-function(hypeFile=NULL,csvFile=NULL,hype2csv=NULL,hype2csvFile=NULL,assimOn="off"){
   
   #hype2csvFile="D:/TEP/ModellingService/sandbox/home/dgustafsson/hypeapps-historical/src/main/app-resources/model/niger-hype/shapefiles/niger-hype2csv.txt"
   #hype2csv=NULL
@@ -82,6 +82,11 @@ basinfiles2csv<-function(hypeFile=NULL,csvFile=NULL,hype2csv=NULL,hype2csvFile=N
   # read hypeFile
   # ------------------------------------------------------
   hypeData=ReadBasinOutput(filename = hypeFile)
+  # also read min and max if assimOn=T
+  if(assimOn=="on"){
+    hypeDataMin=ReadBasinOutput(filename = paste(substr(hypeFile,1,nchar(hypeFile)-4),"_002.txt",sep=""))
+    hypeDataMax=ReadBasinOutput(filename = paste(substr(hypeFile,1,nchar(hypeFile)-4),"_003.txt",sep=""))
+  }
   # read subid from filename
   splitFile=strsplit(hypeFile,split="/")[[1]]
   basinFile=splitFile[length(splitFile)]
@@ -97,8 +102,11 @@ basinfiles2csv<-function(hypeFile=NULL,csvFile=NULL,hype2csv=NULL,hype2csvFile=N
   
   # format values to a vector
   # ------------------------------------------------------
-  values = unlist(hypeData[,2:ncol(hypeData)])  
-  
+  values = unlist(hypeData[,2:ncol(hypeData)])
+  if(assimOn=="on"){
+    valuesMin = unlist(hypeDataMin[,2:ncol(hypeData)])
+    valuesMax = unlist(hypeDataMax[,2:ncol(hypeData)])
+  }
   # get coordinates from hype2csv
   # ------------------------------------------------------
   mat = match(subid,hype2csv$SUBID)
@@ -113,15 +121,25 @@ basinfiles2csv<-function(hypeFile=NULL,csvFile=NULL,hype2csv=NULL,hype2csvFile=N
   numVars=length(varStr)
   numVals=length(values)
   numDates=nrow(hypeData)
-  csvdata=data.frame(id = seq(1,numVals,1),
-                 timestamp = rep(hypeData$DATE,times=numVars),
-                 longitude = rep(long,each=numDates),
-                 latitude  = rep(lat,each=numDates),
-                 uom       = rep(unitStr,each=numDates),
-                 value     = values,
-                 class     = rep(varStr,each=numDates),
-                 subbasin  = rep(subid,times=numVals))
-  
+  if(assimOn=="on"){
+    csvdata=data.frame(id = seq(1,numVals*3,1),
+                       timestamp = c(rep(hypeData$DATE,times=numVars),rep(hypeData$DATE,times=numVars),rep(hypeData$DATE,times=numVars)),
+                       longitude = c(rep(long,each=numDates),rep(long,each=numDates),rep(long,each=numDates)),
+                       latitude  = c(rep(lat,each=numDates),rep(lat,each=numDates),rep(lat,each=numDates)),
+                       uom       = c(rep(unitStr,each=numDates),rep(unitStr,each=numDates),rep(unitStr,each=numDates)),
+                       value     = c(values,valuesMin,valuesMax),
+                       class     = c(rep(varStr,each=numDates),rep(paste(varStr,"MIN",sep=""),each=numDates),rep(paste(varStr,"MAX",sep=""),each=numDates)),
+                       subbasin  = c(rep(subid,times=numVals),rep(subid,times=numVals),rep(subid,times=numVals)))
+  }else{
+    csvdata=data.frame(id = seq(1,numVals,1),
+                   timestamp = rep(hypeData$DATE,times=numVars),
+                   longitude = rep(long,each=numDates),
+                   latitude  = rep(lat,each=numDates),
+                   uom       = rep(unitStr,each=numDates),
+                   value     = values,
+                   class     = rep(varStr,each=numDates),
+                   subbasin  = rep(subid,times=numVals))
+  }
   # write output file
   # ------------------------------------------------------
   write.table(csvdata,file=csvFile,sep=",",row.names=FALSE,quote=FALSE)

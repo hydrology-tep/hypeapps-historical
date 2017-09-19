@@ -16,7 +16,7 @@
 #
 # hypeapps-environment.R: Paths and other settings for h-TEP hydrological modelling applications
 # Author:                 David Gustafsson, SMHI
-# Version:                2017-05-16
+# Version:                2017-09-15
 #
 
 ## set system flag, if not set
@@ -31,24 +31,7 @@ if(app.sys=="tep"){
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("rciop package loaded"), "/util/R/hypeapps-environment.R")}
 
-
-## Model settings 
-model.name = "niger-hype"
-if(app.sys=="win"){
-  model.bin  = "HYPE_assimilation.exe"
-}else{
-#  model.bin  = "hype_assimilation"
-  model.bin  = "hype-4.12.0"
-}
-if(app.sys=="tep"){rciop.log ("DEBUG", paste("hype binary set to:", model.bin,sep="" ), "/util/R/hypeapps-environment.R")}
-
-## Forcing data source
-if(app.sys=="win"){forcing.data.source =  "local"}
-if(app.sys=="tep"){forcing.data.source =  "hydro-smhi"}
-if(app.sys=="tep"){rciop.log ("DEBUG", paste(" forcing data soruce set to:", forcing.data.source,sep="" ), "/util/R/hypeapps-environment.R")}
-
-
-## folder settings
+## Folder settings
 if(app.sys=="tep"){
   app.app_path = Sys.getenv("_CIOP_APPLICATION_PATH")
   app.tmp_path = TMPDIR
@@ -60,6 +43,22 @@ if(app.sys=="tep"){
   app.tmp_path = ""
 }
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("application paths set"), "/util/R/hypeapps-environment.R")}
+
+## settings for plotting with Cairo (TEP only)
+if(app.sys=="tep"){
+  app.rscript4plotting        = "/opt/anaconda/envs/cairo-env/bin/Rscript"
+}else if(app.sys=="win"){
+  app.rscript4plotting = "Rscript.exe"
+}else{
+  app.rscript4plotting = "Rscript"
+}
+app.plotscriptBasinOutput    = paste(app.app_path,"util/R/hypeapps-plot-basinoutput.R",sep="/")
+app.plotscriptForecastBasin  = paste(app.app_path,"util/R/hypeapps-plot-forecast-basin.R",sep="/")
+app.plotscriptForecastMap    = paste(app.app_path,"util/R/hypeapps-plot-forecast-map.R",sep="/")
+
+## Model settings and data access information
+if(app.sys=="tep"){source(paste(Sys.getenv("_CIOP_APPLICATION_PATH"), "util/R/hypeapps-model-settings.R",sep="/"))}
+if(app.sys=="tep"){rciop.log ("DEBUG", paste("model and data access settings sourced"), "/util/R/hypeapps-environment.R")}
 
 ## Flag that this file has been sourced
 app.envset=T
