@@ -16,7 +16,7 @@
 #
 # hypeapps-plot-basinoutput.R: Script to plot HYPE basinoutput data, used for TEP Hydrology.
 # Author:                      David Gustafsson, SMHI
-# Version:                     2017-05-22
+# Version:                     2017-05-20
 
 # -------------------------------------------------------------------
 # 1 - Argument inputs

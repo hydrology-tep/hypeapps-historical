@@ -46,13 +46,14 @@ if(app.sys=="tep"){rciop.log ("DEBUG", paste("application paths set"), "/util/R/
 
 ## settings for plotting with Cairo (TEP only)
 if(app.sys=="tep"){
-  app.rscript4plotting        = "/opt/anaconda/envs/cairo-env/bin/Rscript"
+  app.rscript4plotting = "/opt/anaconda/envs/cairo-env/bin/Rscript"
 }else if(app.sys=="win"){
   app.rscript4plotting = "Rscript.exe"
 }else{
   app.rscript4plotting = "Rscript"
 }
 app.plotscriptBasinOutput    = paste(app.app_path,"util/R/hypeapps-plot-basinoutput.R",sep="/")
+app.plotscriptMapOutput      = paste(app.app_path,"util/R/hypeapps-plot-mapoutput.R",sep="/")
 app.plotscriptForecastBasin  = paste(app.app_path,"util/R/hypeapps-plot-forecast-basin.R",sep="/")
 app.plotscriptForecastMap    = paste(app.app_path,"util/R/hypeapps-plot-forecast-map.R",sep="/")
 
