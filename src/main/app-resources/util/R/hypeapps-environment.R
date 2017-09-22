@@ -16,7 +16,7 @@
 #
 # hypeapps-environment.R: Paths and other settings for h-TEP hydrological modelling applications
 # Author:                 David Gustafsson, SMHI
-# Version:                2017-09-15
+# Version:                2017-09-22
 #
 
 ## set system flag, if not set
@@ -55,7 +55,7 @@ if(app.sys=="tep"){
 app.plotscriptBasinOutput    = paste(app.app_path,"util/R/hypeapps-plot-basinoutput.R",sep="/")
 app.plotscriptMapOutput      = paste(app.app_path,"util/R/hypeapps-plot-mapoutput.R",sep="/")
 app.plotscriptForecastBasin  = paste(app.app_path,"util/R/hypeapps-plot-forecast-basin.R",sep="/")
-app.plotscriptForecastMap    = paste(app.app_path,"util/R/hypeapps-plot-forecast-map.R",sep="/")
+app.plotscriptWarningLevelMap= paste(app.app_path,"util/R/hypeapps-plot-warninglevel-map.R",sep="/")
 
 ## Model settings and data access information
 if(app.sys=="tep"){source(paste(Sys.getenv("_CIOP_APPLICATION_PATH"), "util/R/hypeapps-model-settings.R",sep="/"))}

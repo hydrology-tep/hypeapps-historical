@@ -16,7 +16,7 @@
 
 # Application 1: "Niger-HYPE historical period" (hypeapps-historial)
 # Author:         David Gustafsson, SMHI
-# Version:        2017-08-23
+# Version:        2017-09-21
 
 # Workflow overview:
 # ------------------
@@ -128,6 +128,7 @@ if(app.sys=="tep"){rciop.log ("DEBUG", paste(" ... model run ready, exit code: "
 app.outdir <- prepareHypeAppsOutput(appSetup  = app.setup,
                                     appInput = app.input,
                                     modelInput = model.input,
+                                    modelForcing = model.forcing,
                                     runRes = attr(model.run,"status"))
 
 ## ------------------------------------------------------------------------------

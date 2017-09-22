@@ -35,10 +35,6 @@ for(i in 1:length(args)){
   else if(i==6){hype2csvFile = args[i]}        # path to hype2csv file (with geolocations)
   else if(i==7){name.retlev  = args[i]}        # path to warning levels file
   else if(i==8){prefix.fn    = args[i]}        # filename prefix
-  
-#  else if(i==8){wl.rp = args[i];nwl=1}          # return period warning level 1
-#  else if(i==9){wl.rp = c(wl.rp,args[i]);nwl=2} # return period warning level 2
-#  else if(i==10){wl.rp = c(wl.rp,args[i]);nwl=3} # return period warning level 3
 #  else if(i==7){longHindFile = args[i]}        # path to longterm hindcast file for regime background
 }
 
@@ -423,10 +419,14 @@ plotHindForWL<-function(hindcast=NULL,
 # --------------------------------------------------------------------------
 
 # echo arguments to the TEP log file'
-rciop.log ("DEBUG", paste(" plot-forecast-basin, hindcastDir: ",hindcastDir,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
-rciop.log ("DEBUG", paste(" plot-forecast-basin, forecastDir: ",forecastDir,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
-rciop.log ("DEBUG", paste(" plot-forecast-basin, plotDir: ",plotDir,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
-rciop.log ("DEBUG", paste(" plot-forecast-basin, basinFile: ",basinFile,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 1 hindcastDir: ",hindcastDir,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 2 forecastDir: ",forecastDir,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 3 plotDir: ",plotDir,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 4 basinFile: ",basinFile,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 5 modelName: ",modelName,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 6 hype2csvFile: ",hype2csvFile,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 7 name.retlev: ",name.retlev,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
+rciop.log ("DEBUG", paste(" plot-forecast-basin, 8 prefix.fn: ",prefix.fn,sep=""), "/util/R/hypeapps-plot-forecast-basin.R")
 
 # get subid from basinoutput filename
 subid=as.integer(strsplit(basinFile,split = ".txt"))
