@@ -49,6 +49,10 @@
                   <requires>
                     <require>miniconda</require>
                   </requires>
+                  <postinstallScriptlet combine.self="override">
+                    <scriptFile>${basedir}/src/main/app-resources/scripts/postinstall.sh</scriptFile>
+                    <fileEncoding>utf-8</fileEncoding>
+                  </postinstallScriptlet>
                 </configuration>
               </execution>
             </executions>
