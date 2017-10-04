@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.terradue</groupId>
     <artifactId>dcs-R-parent</artifactId>
-    <version>2.0.0</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
   <description>H-TEP Hydrological Modelling Application - Simulation of an historical period</description>
   <version>1.0</version>
