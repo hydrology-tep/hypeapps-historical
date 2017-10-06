@@ -15,7 +15,7 @@
   <properties>
     <summary>H-TEP Hydrological Modelling Thematic Application  - Simulation of a historical period</summary>
     <description>H-TEP Hydrological Modelling Thematic Application  - Simulation of a historical period</description>
-    <community>hydro-tep</community>
+    <community>hydrology-tep</community>
     <yumRepo>hydrology-tep</yumRepo>
   </properties>
   <scm>
