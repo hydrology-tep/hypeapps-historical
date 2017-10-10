@@ -49,6 +49,7 @@
                   <requires>
                     <require>miniconda</require>
                     <require>openjpeg2</require>
+                    <require>proj</require>
                   </requires>
                   <postinstallScriptlet combine.self="override">
                     <scriptFile>${basedir}/src/main/app-resources/scripts/postinstall.sh</scriptFile>
