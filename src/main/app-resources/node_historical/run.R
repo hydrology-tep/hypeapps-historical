@@ -16,7 +16,7 @@
 
 # Application 1: "Niger-HYPE historical period" (hypeapps-historial)
 # Author:         David Gustafsson, SMHI
-# Version:        2017-09-21
+# Version:        2017-11-08
 
 # Workflow overview:
 # ------------------
@@ -42,8 +42,8 @@ if(!exists("app.sys")){
 if(app.sys=="tep"){
   library("rciop")
   
-  rciop.log ("DEBUG", " *** hypeapps-historical *** TEP hydrological modelling applications ***", "/node_historical/run.R")
-  rciop.log ("DEBUG", " rciop library loaded", "/node_historical/run.R")
+  rciop.log("DEBUG", " *** hypeapps-historical *** TEP hydrological modelling applications ***", "/node_historical/run.R")
+  rciop.log("DEBUG", " rciop library loaded", "/node_historical/run.R")
   
   setwd(TMPDIR)
   rciop.log("DEBUG", paste(" R session working directory set to ",TMPDIR,sep=""), "/node_historical/run.R")
@@ -58,13 +58,18 @@ if(app.sys=="tep"){
   source("application/util/R/hypeapps-environment.R")  
   source("application/util/R/hypeapps-utils.R")
 }
+
+## open application logfile
+logFile=appLogOpen(appName = app.name,tmpDir = getwd())
+
 #################################################################################
 ## 2 - Application user inputs
 ## ------------------------------------------------------------------------------
 ## application input parameters
 app.input <- getHypeAppInput(appName = app.name)
 
-if(app.sys=="tep"){rciop.log ("DEBUG", paste(" hypeapps inputs and parameters read"), "/node_historical/run.R")}
+if(app.sys=="tep"){rciop.log("DEBUG", paste(" hypeapps inputs and parameters read"), "/node_historical/run.R")}
+log.res=appLogWrite(logText = "Inputs and parameters read",fileConn = logFile$fileConn)
 
 #################################################################################
 ## 3 - Application setup
@@ -82,6 +87,7 @@ app.setup <- getHypeAppSetup(modelName = model.name,
                              stateFilesIN = state.files)
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("HypeApp setup read"), "/node_historical/run.R")}
+log.res=appLogWrite(logText = "HypeApp setup read",fileConn = logFile$fileConn)
 
 ## ------------------------------------------------------------------------------
 ## forcing data
@@ -90,33 +96,39 @@ model.forcing <- getModelForcing(appSetup   = app.setup,
                                  dataSource = forcing.data.source)
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("model forcing set"), "/node_historical/run.R")}
+log.res=appLogWrite(logText = "Model forcing prepared",fileConn = logFile$fileConn)
 
 ## ------------------------------------------------------------------------------
 ## get Xobs input file(s) from open catalogue
 xobs.data <- getXobsData(appInput = app.input,
                          appSetup = app.setup)
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("xobs data downloaded from catalogue"), "/node_historical/run.R")}
+log.res=appLogWrite(logText = "xobs data (if any) downloaded from catalogue",fileConn = logFile$fileConn)
 
 ## ------------------------------------------------------------------------------
 ## read downloaded Xobs input file(s) - merge into one Xobs.txt in the model run folder
 xobs.input <- readXobsData(appSetup = app.setup,
                          xobsData = xobs.data)
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("xobs data merged to model rundir"), "/node_historical/run.R")}
+log.res=appLogWrite(logText = "Xobs data (if any) merged into model directory",fileConn = logFile$fileConn)
 
 ## ------------------------------------------------------------------------------
 ## modify some model files based on input parameters
 model.input <- updateModelInput(appSetup = app.setup, appInput = app.input, modelForcing = model.forcing, xobsInput = xobs.input)
 
 if(app.sys=="tep"){rciop.log ("DEBUG", paste("model inputs modified"), "/node_historical/run.R")}
-
+log.res=appLogWrite(logText = "model inputs modified",fileConn = logFile$fileConn)
 
 #################################################################################
 ## 4 - Run application
 ## ------------------------------------------------------------------------------
 ##  run model
 if(app.sys=="tep"){rciop.log ("DEBUG", " starting model run ...", "/node_historical/run.R")}
+log.res=appLogWrite(logText = "starting model run ...",fileConn = logFile$fileConn)
+
 model.run = system(command = app.setup$runCommand,intern = T,)
 
+log.res=appLogWrite(logText = "..model run ready",fileConn = logFile$fileConn)
 if(app.sys=="tep"){rciop.log ("DEBUG", paste(" ... model run ready, exit code: ",attr(model.run,"status"),sep=""), "/node_historical/run.R")}
 
 
@@ -131,13 +143,24 @@ app.outdir <- prepareHypeAppsOutput(appSetup  = app.setup,
                                     modelForcing = model.forcing,
                                     runRes = attr(model.run,"status"))
 
+log.res=appLogWrite(logText = "HypeApp outputs prepared",fileConn = logFile$fileConn)
+
 ## ------------------------------------------------------------------------------
 ## publish postprocessed results (adding /* to avoid duplicate outputs to the user)
 if(app.sys=="tep"){
   rciop.publish(path=paste(app.outdir,"/*",sep=""), recursive=FALSE, metalink=TRUE)
 }
+log.res=appLogWrite(logText = "HypeApp outputs published",fileConn = logFile$fileConn)
+
+## close and publish the logfile
+log.file=appLogClose(appName = app.name,fileConn = logFile$fileConn)
+if(app.sys=="tep"){
+  rciop.publish(path=logFile$fileName, recursive=FALSE, metalink=TRUE)
+}
+
 #################################################################################
 ## 6 - End of workflow
 ## ------------------------------------------------------------------------------
 ## exit with appropriate status code
+
 q(save="no", status = 0)
