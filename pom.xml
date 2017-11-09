@@ -11,7 +11,7 @@
     <version>2.0.0</version>
   </parent>
   <description>H-TEP Hydrological Modelling Application - Simulation of an historical period</description>
-  <version>1.3</version>
+  <version>1.4-SNAPSHOT</version>
   <properties>
     <summary>H-TEP Hydrological Modelling Thematic Application  - Simulation of a historical period</summary>
     <description>H-TEP Hydrological Modelling Thematic Application  - Simulation of a historical period</description>
