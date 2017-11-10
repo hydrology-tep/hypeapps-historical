@@ -24,9 +24,6 @@ pipeline {
             sh 'mvn -B deploy'
         }
 
-        script {
-          artserver.publishBuildInfo buildInfo
-        }
       }
     }
   }
