@@ -50,6 +50,7 @@
                     <require>miniconda</require>
                     <require>openjpeg2</require>
                     <require>proj</require>
+		    <require>libgfortran</require>
                     <require>ghostscript-fonts</require>
                     <require>urw-fonts</require>
                   </requires>
