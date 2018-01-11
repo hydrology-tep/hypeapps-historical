@@ -137,18 +137,30 @@ if(app.sys=="tep"){rciop.log ("DEBUG", paste(" ... model run ready, exit code: "
 ## 5 - Output
 ## ------------------------------------------------------------------------------
 ## post-process output data
-app.outdir <- prepareHypeAppsOutput(appSetup  = app.setup,
+#app.outdir <- prepareHypeAppsOutput(appSetup  = app.setup,
+#                                    appInput = app.input,
+#                                    modelInput = model.input,
+#                                    modelForcing = model.forcing,
+#                                    runRes = attr(model.run,"status"))
+app.outfiles <- prepareHypeAppsOutput(appSetup  = app.setup,
                                     appInput = app.input,
                                     modelInput = model.input,
                                     modelForcing = model.forcing,
                                     runRes = attr(model.run,"status"))
 
+if(length(app.outfiles)>1){
+  app.outfiles=sort(app.outfiles,decreasing = F)
+}
+
 log.res=appLogWrite(logText = "HypeApp outputs prepared",fileConn = logFile$fileConn)
 
 ## ------------------------------------------------------------------------------
 ## publish postprocessed results (adding /* to avoid duplicate outputs to the user)
-if(app.sys=="tep"){
-  rciop.publish(path=paste(app.outdir,"/*",sep=""), recursive=FALSE, metalink=TRUE)
+#if(app.sys=="tep"){
+#  rciop.publish(path=paste(app.outdir,"/*",sep=""), recursive=FALSE, metalink=TRUE)
+#}
+for(k in 1:length(app.outfiles)){
+  rciop.publish(path=app.outfiles[k], recursive=FALSE, metalink=TRUE)
 }
 log.res=appLogWrite(logText = "HypeApp outputs published",fileConn = logFile$fileConn)
 
