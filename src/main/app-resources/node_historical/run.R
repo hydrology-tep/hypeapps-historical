@@ -16,7 +16,7 @@
 
 # Application 1: "Niger-HYPE historical period" (hypeapps-historial)
 # Author:         David Gustafsson, SMHI
-# Version:        2018-01-18
+# Version:        2018-02-06
 
 # Workflow overview:
 # ------------------
@@ -63,7 +63,7 @@ if(app.sys=="tep"){
 }
 
 ## open application logfile
-logFile=appLogOpen(appName = app.name,tmpDir = getwd(),appDate = app.date,prefix="009")
+logFile=appLogOpen(appName = app.name,tmpDir = getwd(),appDate = app.date,prefix="000")
 
 #################################################################################
 ## 2 - Application user inputs
