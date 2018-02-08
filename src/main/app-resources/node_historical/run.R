@@ -16,7 +16,7 @@
 
 # Application 1: "Niger-HYPE historical period" (hypeapps-historial)
 # Author:         David Gustafsson, SMHI
-# Version:        2017-11-08
+# Version:        2018-02-06
 
 # Workflow overview:
 # ------------------
@@ -30,6 +30,9 @@
 #################################################################################
 ## 1 - Initialization
 ## ------------------------------------------------------------------------------
+## create a date tag to include in output filenames
+app.date = format(Sys.time(), "%Y%m%d_%H%M")
+
 ## set application name
 app.name = "historical"
 ## ------------------------------------------------------------------------------
@@ -60,7 +63,7 @@ if(app.sys=="tep"){
 }
 
 ## open application logfile
-logFile=appLogOpen(appName = app.name,tmpDir = getwd())
+logFile=appLogOpen(appName = app.name,tmpDir = getwd(),appDate = app.date,prefix="000")
 
 #################################################################################
 ## 2 - Application user inputs
@@ -146,7 +149,8 @@ app.outfiles <- prepareHypeAppsOutput(appSetup  = app.setup,
                                     appInput = app.input,
                                     modelInput = model.input,
                                     modelForcing = model.forcing,
-                                    runRes = attr(model.run,"status"))
+                                    runRes = attr(model.run,"status"),
+                                    appDate = app.date)
 
 if(length(app.outfiles)>1){
   app.outfiles=sort(app.outfiles,decreasing = F)
